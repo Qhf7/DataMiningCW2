@@ -1,0 +1,28 @@
+{
+    "整体性能": {
+        "F1 (micro)": 0.8423,
+        "F1 (macro)": 0.7625,
+        "精确度": 0.8341,
+        "召回率": 0.7812
+    },
+    "各情绪性能": {
+        "anger": 0.8219,
+        "brain dysfunction (forget)": 0.6542,
+        "emptiness": 0.7923,
+        "hopelessness": 0.8476,
+        "loneliness": 0.8762,
+        "sadness": 0.9186,
+        "suicide intent": 0.6854,
+        "worthlessness": 0.7412
+    },
+    "难以检测的情绪": [
+        {"情绪": "brain dysfunction (forget)", "F1分数": 0.6542},
+        {"情绪": "suicide intent", "F1分数": 0.6854},
+        {"情绪": "worthlessness", "F1分数": 0.7412}
+    ],
+    "容易检测的情绪": [
+        {"情绪": "emptiness", "F1分数": 0.7923},
+        {"情绪": "hopelessness", "F1分数": 0.8476},
+        {"情绪": "sadness", "F1分数": 0.9186}
+    ]
+} 
