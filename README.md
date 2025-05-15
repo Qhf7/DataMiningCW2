@@ -1,71 +1,75 @@
-# 抑郁情绪多标签分类系统
+Certainly! Here is the full English translation of your README.md:
 
-基于深度学习和自然语言处理技术的抑郁情绪多标签分类系统，能够从文本中识别8种不同的抑郁情绪表现。
+---
 
-## 情绪类别
+# Multi-label Depression Emotion Classification System
 
-系统可以识别以下8种抑郁相关情绪：
+A multi-label depression emotion classification system based on deep learning and natural language processing techniques, capable of identifying eight different manifestations of depressive emotions from text.
 
-1. 愤怒 (anger)
-2. 认知功能障碍/遗忘 (brain dysfunction/forget)
-3. 空虚感 (emptiness)
-4. 绝望感 (hopelessness)
-5. 孤独感 (loneliness)
-6. 悲伤 (sadness)
-7. 自杀意念 (suicide intent)
-8. 无价值感 (worthlessness)
+## Emotion Categories
 
-## 系统架构
+The system can identify the following eight depression-related emotions:
 
-系统主要由以下几部分组成：
+1. Anger
+2. Cognitive dysfunction/forgetfulness
+3. Emptiness
+4. Hopelessness
+5. Loneliness
+6. Sadness
+7. Suicide intent
+8. Worthlessness
 
-1. **增强型BERT模型**：基于预训练的BERT模型，添加了注意力机制和情感特征融合层
-2. **文本增强模块**：对训练数据进行自动增强，提高模型对少见情绪类别的识别能力
-3. **评估与可视化工具**：分析模型性能并生成可视化结果
+## System Architecture
 
-## 核心模型架构
+The system mainly consists of the following components:
 
-### BERT 模型详解
+1. **Enhanced BERT Model**: Based on the pre-trained BERT model, with an added attention mechanism and emotional feature fusion layer.
+2. **Text Augmentation Module**: Automatically augments training data to improve recognition of rare emotion categories.
+3. **Evaluation and Visualization Tools**: Analyze model performance and generate visual results.
 
-我们的系统以BERT（Bidirectional Encoder Representations from Transformers）为基础，这是一种预训练的双向Transformer编码器架构。我们主要采用以下BERT变体：
+## Core Model Architecture
 
-- **bert-base-chinese**: 针对中文文本优化的BERT模型
-- **bert-base-uncased**: 用于英文文本处理的基础BERT模型
+### BERT Model Details
 
-BERT的优势在于：
+Our system is based on BERT (Bidirectional Encoder Representations from Transformers), a pre-trained bidirectional transformer encoder architecture. We mainly use the following BERT variants:
 
-- **双向上下文理解**：同时考虑左右上下文信息，理解语义更准确
-- **预训练-微调范式**：充分利用大规模无标注数据的预训练表示
-- **深层语义编码**：Transformer的多层架构能够捕获不同粒度的语言信息
+- **bert-base-chinese**: BERT model optimized for Chinese text
+- **bert-base-uncased**: Basic BERT model for English text processing
 
-我们在BERT基础上做了如下改进：
+Advantages of BERT:
 
-1. **选择性层冻结**：冻结底部6层参数，仅微调上层，减轻过拟合
-2. **特征投影层**：添加线性投影层，将BERT输出从768维减少到512维
-3. **多头自注意力层**：增强对不同情感表达的关注
-4. **情感特征融合**：融合BERT表示与传统情感分析特征
+- **Bidirectional Context Understanding**: Considers both left and right context for more accurate semantic understanding.
+- **Pretraining-Fine-tuning Paradigm**: Makes full use of large-scale unlabeled data for pre-trained representations.
+- **Deep Semantic Encoding**: The multi-layer architecture of Transformer can capture language information at different granularities.
 
-### 文本特征提取模块
+Our improvements on BERT include:
 
-TextFeatureExtractor类负责从文本中提取深层语义特征：
+1. **Selective Layer Freezing**: Freeze the bottom 6 layers and only fine-tune the upper layers to reduce overfitting.
+2. **Feature Projection Layer**: Add a linear projection layer to reduce BERT output from 768 to 512 dimensions.
+3. **Multi-head Self-attention Layer**: Enhance attention to different emotional expressions.
+4. **Emotional Feature Fusion**: Fuse BERT representations with traditional sentiment analysis features.
+
+### Text Feature Extraction Module
+
+The `TextFeatureExtractor` class is responsible for extracting deep semantic features from text:
 
 ```python
 class TextFeatureExtractor(nn.Module):
     def __init__(self, model_type='bert', freeze_bert_layers=6):
         super(TextFeatureExtractor, self).__init__()
-        # 选择预训练模型
+        # Choose pre-trained model
         if model_type == 'bert':
             self.bert = BertModel.from_pretrained('bert-base-chinese')
             self.hidden_size = self.bert.config.hidden_size
-        # ...其他模型类型
+        # ...other model types
         
-        # 选择性冻结底层
+        # Selective layer freezing
         if freeze_bert_layers > 0:
             for param in self.bert.embeddings.parameters():
                 param.requires_grad = False
-            # ...冻结指定层数
+            # ...freeze specified layers
             
-        # 特征投影层
+        # Feature projection layer
         self.feature_projection = nn.Sequential(
             nn.Linear(self.hidden_size, 512),
             nn.LayerNorm(512),
@@ -74,64 +78,64 @@ class TextFeatureExtractor(nn.Module):
         )
 ```
 
-### 特征融合与分类层
+### Feature Fusion and Classification Layer
 
-我们采用多特征融合策略，结合深度特征和传统文本挖掘特征：
+We use a multi-feature fusion strategy, combining deep features and traditional text mining features:
 
-1. **自注意力机制**：捕获文本内部的长距离依赖关系
-2. **情感词汇特征**：整合TF-IDF和主题模型提取的特征
-3. **多任务学习**：主任务（情绪分类）与辅助任务（情感极性预测）
+1. **Self-attention Mechanism**: Captures long-distance dependencies within the text.
+2. **Sentiment Lexicon Features**: Integrates features extracted by TF-IDF and topic models.
+3. **Multi-task Learning**: Main task (emotion classification) and auxiliary task (sentiment polarity prediction).
 
-## 数据清洗与规范化
+## Data Cleaning and Normalization
 
-文本处理流水线包含以下步骤：
+The text processing pipeline includes the following steps:
 
-### 文本清洗
+### Text Cleaning
 
 ```python
 def clean_text(self, text):
-    """文本清洗"""
+    """Text cleaning"""
     if not isinstance(text, str):
         return ""
         
-    # 移除多余空格
+    # Remove excess spaces
     text = re.sub(r'\s+', ' ', text)
     
-    # 移除特殊字符，仅保留中文、英文、数字和基本标点
+    # Remove special characters, only keep Chinese, English, numbers, and basic punctuation
     text = re.sub(r'[^\w\s\u4e00-\u9fff。，！？、；：""''（）【】《》]', '', text)
     
     return text.strip()
 ```
 
-### 文本正则化
+### Text Normalization
 
-1. **字符级标准化**：统一全角/半角符号、简繁体转换
-2. **分词与停用词过滤**：使用NLTK分词，移除停用词
-3. **标点符号标准化**：统一标点符号格式
-4. **特征抽取**：提取统计特征，包括文本长度、词频、标点符号计数等
+1. **Character-level Standardization**: Unify full-width/half-width symbols, simplify/traditional conversion.
+2. **Word Segmentation and Stopword Removal**: Use NLTK for tokenization and remove stopwords.
+3. **Punctuation Normalization**: Unify punctuation formats.
+4. **Feature Extraction**: Extract statistical features, including text length, word frequency, punctuation count, etc.
 
-## 文本增强技术
+## Text Augmentation Techniques
 
-为解决类别不平衡问题和提高模型泛化能力，我们使用多种文本增强策略：
+To address class imbalance and improve model generalization, we use multiple text augmentation strategies:
 
-### 1. 同义词替换增强
+### 1. Synonym Replacement Augmentation
 
 ```python
 def synonym_replacement(self, text, n=2):
-    """同义词替换增强"""
+    """Synonym replacement augmentation"""
     words = self.preprocessor.segment(text, remove_stop_words=False)
     new_words = words.copy()
     
-    # 记录可替换的词位置
+    # Record positions that can be replaced
     replaced_positions = []
     
-    # 尝试替换n个词
+    # Try to replace n words
     replacement_count = 0
     for i, word in enumerate(words):
         if word in self.synonyms and i not in replaced_positions and replacement_count < n:
             synonyms = self.synonyms[word]
             if synonyms:
-                # 随机选择一个同义词进行替换
+                # Randomly choose a synonym for replacement
                 replacement = np.random.choice(synonyms)
                 new_words[i] = replacement
                 replaced_positions.append(i)
@@ -140,21 +144,21 @@ def synonym_replacement(self, text, n=2):
     return ''.join(new_words)
 ```
 
-### 2. 回译技术（以中文为例）
+### 2. Back Translation (Chinese Example)
 
-通过将原始文本翻译成中间语言（如英语）再翻译回原语言，产生语义相似但表达不同的文本变体：
+Generate semantically similar but differently expressed text variants by translating the original text into an intermediate language (such as English) and then back to the original language:
 
 ```python
 def back_translation(self, text):
-    """回译（模拟）"""
-    # 抑郁相关文本的回译变体
+    """Back translation (simulation)"""
+    # Back-translation variants for depression-related text
     depression_translations = {
         "我感到非常难过和无助": "我感到极度悲伤和绝望。似乎没有任何事物能够让我感到一丝希望。",
         "我最近总是感到疲惫": "近期我一直感到精疲力竭，仿佛被抽干了所有精力。",
-        # ...更多模板
+        # ...more templates
     }
     
-    # 查找匹配的文本进行替换
+    # Find matching text for replacement
     for source, target in depression_translations.items():
         if source in text:
             return text.replace(source, target)
@@ -162,21 +166,21 @@ def back_translation(self, text):
     return text
 ```
 
-### 3. 随机插入情感词汇（以中文为例）
+### 3. Random Insertion of Sentiment Words (Chinese Example)
 
 ```python
 def random_insertion(self, text, n=1):
-    """随机插入情感词汇"""
+    """Randomly insert sentiment words"""
     words = self.preprocessor.segment(text, remove_stop_words=False)
     
-    # 情感词汇库
-    depression_words = ["孤独", "疲惫", "失落", "压抑", "痛苦", "悲伤", "绝望"]
-    positive_words = ["轻松", "舒适", "满足", "温暖", "安心", "开心", "喜悦"]
+    # Sentiment word bank
+    depression_words = ["loneliness", "fatigue", "loss", "oppression", "pain", "sadness", "despair"]
+    positive_words = ["relaxed", "comfortable", "satisfied", "warm", "secure", "happy", "joy"]
     
-    # 根据文本情感倾向选择词库
-    word_list = depression_words if any(word in text for word in ["难过", "无助", "痛苦"]) else positive_words
+    # Select word bank based on emotional tendency of the text
+    word_list = depression_words if any(word in text for word in ["sad", "helpless", "pain"]) else positive_words
         
-    # 执行插入
+    # Perform insertion
     for _ in range(n):
         word_to_insert = np.random.choice(word_list)
         insert_pos = np.random.randint(0, len(words) + 1)
@@ -185,17 +189,17 @@ def random_insertion(self, text, n=1):
     return ''.join(words)
 ```
 
-### 4. 随机词语交换
+### 4. Random Word Swap
 
 ```python
 def random_swap(self, text, n=1):
-    """随机交换词序"""
+    """Randomly swap word order"""
     words = self.preprocessor.segment(text, remove_stop_words=False)
     
     if len(words) < 2:
         return text
         
-    # 执行交换
+    # Perform swaps
     for _ in range(n):
         idx1, idx2 = np.random.choice(len(words), 2, replace=False)
         words[idx1], words[idx2] = words[idx2], words[idx1]
@@ -203,16 +207,16 @@ def random_swap(self, text, n=1):
     return ''.join(words)
 ```
 
-### 5. EDA集成增强
+### 5. EDA Integrated Augmentation
 
-我们采用Easy Data Augmentation (EDA)策略，综合多种增强方法：
+We use Easy Data Augmentation (EDA) strategy, integrating multiple augmentation methods:
 
 ```python
 def eda_augment(self, text, alpha=0.3):
-    """整合多种增强方法"""
+    """Integrate multiple augmentation methods"""
     augmented_text = text
     
-    # 以一定概率应用每种增强方法
+    # Apply each augmentation method with a certain probability
     if np.random.random() < alpha:
         augmented_text = self.synonym_replacement(augmented_text)
         
@@ -228,35 +232,35 @@ def eda_augment(self, text, alpha=0.3):
     return augmented_text
 ```
 
-## 文本挖掘与特征工程
+## Text Mining and Feature Engineering
 
-除深度学习特征外，我们还整合了传统文本挖掘技术：
+In addition to deep learning features, we also integrate traditional text mining techniques:
 
-### 1. TF-IDF特征提取
+### 1. TF-IDF Feature Extraction
 
-使用TF-IDF (Term Frequency-Inverse Document Frequency)算法提取关键词特征，捕获文档特异性术语。
+TF-IDF (Term Frequency-Inverse Document Frequency) algorithm is used to extract keyword features and capture document-specific terms.
 
-### 2. 主题模型 (LDA)
+### 2. Topic Modeling (LDA)
 
-使用Latent Dirichlet Allocation模型提取潜在主题特征：
+Latent Dirichlet Allocation (LDA) model is used to extract latent topic features:
 
 ```python
 def extract_features(self, text):
-    """提取文本特征"""
+    """Extract text features"""
     tfidf_vector = self.tfidf_vectorizer.transform([text])
     
-    # TF-IDF特征
+    # TF-IDF features
     tfidf_features = tfidf_vector.toarray().flatten()
     
-    # 主题特征
+    # Topic features
     topic_features = self.lda_model.transform(tfidf_vector).flatten()
     
-    # 情感特征（简化版）
+    # Sentiment feature (simplified)
     sentiment_score = self.calculate_sentiment_score(text)
     
-    # 整合所有特征
+    # Integrate all features
     all_features = np.concatenate([
-        tfidf_features[:20],  # 取前20个TF-IDF特征
+        tfidf_features[:20],  # Take first 20 TF-IDF features
         topic_features,
         np.array([sentiment_score])
     ])
@@ -264,18 +268,18 @@ def extract_features(self, text):
     return all_features
 ```
 
-### 3. 统计特征分析
+### 3. Statistical Feature Analysis
 
-提取多种统计特征，捕捉文本风格和情感特征：
+Extract a variety of statistical features to capture text style and emotional features:
 
-- 文本长度特征（字符数、词数、平均词长）
-- 词频特征（唯一词数、词汇多样性）
-- 标点符号特征（逗号、句号、问号、感叹号计数）
-- 情感词汇计数和情感比率
+- Text length features (number of characters, words, average word length)
+- Word frequency features (number of unique words, vocabulary diversity)
+- Punctuation features (count of commas, periods, question marks, exclamation marks)
+- Sentiment word count and sentiment ratio
 
-## 安装与环境配置
+## Installation and Environment Setup
 
-### 环境要求
+### Environment Requirements
 
 - Python 3.7+
 - PyTorch 1.9+
@@ -286,87 +290,87 @@ def extract_features(self, text):
 - pandas
 - numpy
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
 pip install torch torchvision transformers sklearn matplotlib seaborn pandas numpy jieba
 ```
 
-## 使用方法
+## Usage
 
-### 数据准备
+### Data Preparation
 
-系统使用JSON格式的数据，每行一个样本，格式如下：
+The system uses JSON-formatted data, one sample per line, in the following format:
 
 ```json
-{"id": "sample_id", "title": "标题", "post": "内容", "text": "标题 ### 内容", "upvotes": 102, "date": "2022-12-19 19:50:52", "emotions": ["emptiness", "hopelessness"], "label_id": 110000}
+{"id": "sample_id", "title": "Title", "post": "Content", "text": "Title ### Content", "upvotes": 102, "date": "2022-12-19 19:50:52", "emotions": ["emptiness", "hopelessness"], "label_id": 110000}
 ```
 
-数据集需要分为三个文件：
-- `train.json`: 训练集
-- `val.json`: 验证集
-- `test.json`: 测试集
+The dataset needs to be divided into three files:
+- `train.json`: Training set
+- `val.json`: Validation set
+- `test.json`: Test set
 
-### 模型训练
+### Model Training
 
-使用我们提供的脚本运行训练：
+Run the training script we provided:
 
 ```bash
-# 使模型训练脚本可执行
+# Make the training script executable
 chmod +x run_depression_emotion_classifier.sh
 
-# 运行标准训练
+# Run standard training
 ./run_depression_emotion_classifier.sh
 
-# 使用Focal Loss进行训练
+# Train with Focal Loss
 ./run_depression_emotion_classifier.sh focal
 ```
 
-或者直接使用Python命令：
+Or use a Python command directly:
 
 ```bash
-# 训练模式
+# Training mode
 python depression_emotion_classifier.py --mode train --model_name bert-base-cased --train_path Dataset/train.json --val_path Dataset/val.json --epochs 4 --batch_size 8 --max_length 256
 
-# 测试模式
+# Testing mode
 python depression_emotion_classifier.py --mode test --model_name bert-base-cased --model_path best_depression_emotion_model.bin --test_path Dataset/test.json
 ```
 
-### 结果分析与可视化
+### Results Analysis and Visualization
 
-训练完成后，可以使用我们的可视化工具分析模型性能：
+After training, you can use our visualization tool to analyze model performance:
 
 ```bash
 python visualize_results.py --results_file outputs/test_results.json --test_path Dataset/test.json --output_path outputs/analysis
 ```
 
-这将生成以下分析结果：
-- 模型整体性能概览
-- 各情绪类别的F1分数
-- 情绪共病模式分析
-- 综合性能报告
+This will generate the following analysis results:
+- Overview of model performance
+- F1 scores for each emotion category
+- Analysis of emotion comorbidity patterns
+- Comprehensive performance report
 
-## 高级配置
+## Advanced Configuration
 
-### 模型参数调整
+### Model Parameter Adjustment
 
-可以通过修改以下参数来调整模型性能：
+You can adjust model performance by modifying the following parameters:
 
-- `--learning_rate`: 学习率 (默认: 2e-5)
-- `--batch_size`: 批次大小 (默认: 8)
-- `--max_length`: 最大序列长度 (默认: 256)
-- `--epochs`: 训练轮数 (默认: 4)
-- `--use_focal_loss`: 使用Focal Loss而非标准BCE损失函数
+- `--learning_rate`: Learning rate (default: 2e-5)
+- `--batch_size`: Batch size (default: 8)
+- `--max_length`: Maximum sequence length (default: 256)
+- `--epochs`: Number of training epochs (default: 4)
+- `--use_focal_loss`: Use Focal Loss instead of standard BCE loss
 
-### 自定义预训练模型
+### Custom Pre-trained Models
 
-可以使用不同的预训练模型作为基础：
+You can use different pre-trained models as the base:
 
 ```bash
 python depression_emotion_classifier.py --mode train --model_name bert-large-cased --train_path Dataset/train.json --val_path Dataset/val.json
 ```
 
-支持的模型包括：
+Supported models include:
 - bert-base-cased
 - bert-large-cased
 - roberta-base
@@ -374,23 +378,25 @@ python depression_emotion_classifier.py --mode train --model_name bert-large-cas
 - distilbert-base-cased
 - albert-base-v2
 
-## 性能示例
+## Example Performance
 
-在测试集上的性能：
+Performance on the test set:
 
-| 指标 | 分数 |
-|------|------|
-| F1 (micro) | ~0.78 |
-| F1 (macro) | ~0.69 |
-| 精确度 | ~0.82 |
-| 召回率 | ~0.75 |
+| Metric         | Score |
+|----------------|-------|
+| F1 (micro)     | ~0.78 |
+| F1 (macro)     | ~0.69 |
+| Accuracy       | ~0.82 |
+| Recall         | ~0.75 |
 
-不同情绪的F1分数:
-- 悲伤 (sadness): ~0.87
-- 孤独感 (loneliness): ~0.82 
-- 绝望感 (hopelessness): ~0.79
-- 愤怒 (anger): ~0.75
-- 无价值感 (worthlessness): ~0.68
-- 自杀意念 (suicide intent): ~0.60
-- 空虚感 (emptiness): ~0.56 
-- 认知功能障碍 (brain dysfunction): ~0.43
+F1 scores for different emotions:
+- Sadness: ~0.87
+- Loneliness: ~0.82 
+- Hopelessness: ~0.79
+- Anger: ~0.75
+- Worthlessness: ~0.68
+- Suicide intent: ~0.60
+- Emptiness: ~0.56 
+- Cognitive dysfunction: ~0.43
+
+---
