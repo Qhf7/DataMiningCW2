@@ -1,4 +1,3 @@
-Certainly! Here is the full English translation of your README.md:
 
 ---
 
